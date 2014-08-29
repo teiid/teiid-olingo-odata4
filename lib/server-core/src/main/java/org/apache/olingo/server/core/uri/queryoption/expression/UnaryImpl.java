@@ -49,9 +49,8 @@ public class UnaryImpl extends ExpressionImpl implements Unary {
   }
 
   @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    T operand = expression.accept(visitor);
-    return visitor.visitUnaryOperator(operator, operand);
+  public void accept(final ExpressionVisitor visitor) throws ExpressionVisitException, ODataApplicationException {
+    visitor.visit(this);
   }
 
 }

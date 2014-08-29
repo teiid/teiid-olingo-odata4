@@ -45,8 +45,8 @@ public class MemberImpl extends ExpressionImpl implements Member {
   }
 
   @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    return visitor.visitMember(path);
+  public void accept(final ExpressionVisitor visitor) throws ExpressionVisitException, ODataApplicationException {
+    visitor.visit(this);
   }
 
   @Override

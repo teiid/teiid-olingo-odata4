@@ -39,8 +39,8 @@ public class TypeLiteralImpl extends ExpressionImpl implements TypeLiteral {
   }
 
   @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    return visitor.visitTypeLiteral(type);
+  public void accept(final ExpressionVisitor visitor) throws ExpressionVisitException, ODataApplicationException {
+    visitor.visit(this);
   }
 
 }

@@ -53,8 +53,8 @@ public class EnumerationImpl extends ExpressionImpl implements Enumeration {
   }
 
   @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    return visitor.visitEnum(type, values);
+  public void accept(final ExpressionVisitor visitor) throws ExpressionVisitException, ODataApplicationException {
+    visitor.visit(this);
   }
 
 }

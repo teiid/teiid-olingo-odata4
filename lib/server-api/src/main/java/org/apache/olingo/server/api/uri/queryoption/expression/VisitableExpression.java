@@ -45,6 +45,5 @@ public interface VisitableExpression {
    * @throws ODataApplicationException
    * Exception thrown by the application who implemented the visitor
    */
-  <T> T accept(ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException;
-
+  void accept(ExpressionVisitor visitor) throws ExpressionVisitException, ODataApplicationException;
 }

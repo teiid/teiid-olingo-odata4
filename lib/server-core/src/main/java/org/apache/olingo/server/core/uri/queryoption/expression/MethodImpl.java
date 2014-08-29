@@ -58,12 +58,8 @@ public class MethodImpl extends ExpressionImpl implements Method {
   }
 
   @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    List<T> userParameters = new ArrayList<T>();
-    for (ExpressionImpl parameter : parameters) {
-      userParameters.add(parameter.accept(visitor));
-    }
-    return visitor.visitMethodCall(method, userParameters);
+  public void accept(final ExpressionVisitor visitor) throws ExpressionVisitException, ODataApplicationException {
+    visitor.visit(this);
   }
 
 }

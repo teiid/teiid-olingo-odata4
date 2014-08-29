@@ -69,9 +69,10 @@ public class ExpressionTest {
     expression.setParameter("Test");
 
     assertEquals("Test", expression.getParameterName());
-
-    String output = expression.accept(new FilterTreeToText());
-    assertEquals("<Test>", output);
+    FilterTreeToText visitor = new FilterTreeToText();
+    expression.accept(visitor);
+    expression.accept(new FilterTreeToText());
+    assertEquals("<Test>", visitor.getText());
 
   }
 
@@ -89,9 +90,9 @@ public class ExpressionTest {
     assertEquals(expressionLeft, expression.getLeftOperand());
     assertEquals(expressionRight, expression.getRightOperand());
     assertEquals(BinaryOperatorKind.SUB, expression.getOperator());
-
-    String output = expression.accept(new FilterTreeToText());
-    assertEquals("<<A> sub <B>>", output);
+    FilterTreeToText visitor = new FilterTreeToText();
+    expression.accept(visitor);
+    assertEquals("<<A> sub <B>>", visitor.getText());
   }
 
   @Test
@@ -107,7 +108,10 @@ public class ExpressionTest {
     expression.addValue("B");
     assertEquals("A", expression.getValues().get(0));
     assertEquals("B", expression.getValues().get(1));
-    assertEquals("<com.sap.odata.test1.ENString<A,B>>", expression.accept(new FilterTreeToText()));
+
+    FilterTreeToText visitor = new FilterTreeToText();
+    expression.accept(visitor);
+    assertEquals("<com.sap.odata.test1.ENString<A,B>>", visitor.getText());
   }
 
   @Test
@@ -116,7 +120,9 @@ public class ExpressionTest {
     expression.setVariableText("A");
     assertEquals("A", expression.getVariableName());
 
-    assertEquals("<A>", expression.accept(new FilterTreeToText()));
+    FilterTreeToText visitor = new FilterTreeToText();
+    expression.accept(visitor);    
+    assertEquals("<A>", visitor.getText());
 
   }
 
@@ -125,8 +131,10 @@ public class ExpressionTest {
     LiteralImpl expression = new LiteralImpl();
     expression.setText("A");
     assertEquals("A", expression.getText());
+    FilterTreeToText visitor = new FilterTreeToText();
+    expression.accept(visitor);
 
-    assertEquals("<A>", expression.accept(new FilterTreeToText()));
+    assertEquals("<A>", visitor.getText());
   }
 
   @Test
@@ -143,7 +151,9 @@ public class ExpressionTest {
 
     // check accept and path
     assertEquals(uriInfo, expression.getResourcePath());
-    assertEquals("<UARTPrimParam>", expression.accept(new FilterTreeToText()));
+    FilterTreeToText visitor = new FilterTreeToText();
+    expression.accept(visitor);
+    assertEquals("<UARTPrimParam>", visitor.getText());
 
     // UriResourceImplTyped check collection = false case
     assertEquals(false, expression.isCollection());
@@ -206,7 +216,9 @@ public class ExpressionTest {
     expression.addParameter(p1);
 
     assertEquals(MethodKind.CONCAT, expression.getMethod());
-    assertEquals("<concat(<A>,<B>)>", expression.accept(new FilterTreeToText()));
+    FilterTreeToText visitor = new FilterTreeToText();
+    expression.accept(visitor);
+    assertEquals("<concat(<A>,<B>)>", visitor.getText());
 
     assertEquals(p0, expression.getParameters().get(0));
     assertEquals(p1, expression.getParameters().get(1));
@@ -219,7 +231,9 @@ public class ExpressionTest {
     expression.setType(entityBaseType);
 
     assertEquals(entityBaseType, expression.getType());
-    assertEquals("<com.sap.odata.test1.ETBaseTwoKeyNav>", expression.accept(new FilterTreeToText()));
+    FilterTreeToText visitor = new FilterTreeToText();
+    expression.accept(visitor);    
+    assertEquals("<com.sap.odata.test1.ETBaseTwoKeyNav>", visitor.getText());
   }
 
   @Test
@@ -232,8 +246,9 @@ public class ExpressionTest {
 
     assertEquals(UnaryOperatorKind.MINUS, expression.getOperator());
     assertEquals(operand, expression.getOperand());
-
-    assertEquals("<- <A>>", expression.accept(new FilterTreeToText()));
+    FilterTreeToText visitor = new FilterTreeToText();
+    expression.accept(visitor);
+    assertEquals("<- <A>>", visitor.getText());
   }
 
 }

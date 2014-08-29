@@ -355,7 +355,9 @@ public class ResourceValidator implements TestValidator {
 
     ExpressionImpl filterTree = (ExpressionImpl) uriInfo.getFilterOption().getExpression();
     try {
-      String filterTreeAsString = filterTree.accept(new FilterTreeToText());
+      FilterTreeToText visitor = new FilterTreeToText();
+      filterTree.accept(visitor);
+      String filterTreeAsString = visitor.getText();
       assertEquals(expectedFilterTreeAsString, filterTreeAsString);
     } catch (ExpressionVisitException e) {
       fail("isFilterString: Exception " + e.getMessage() + " occured");

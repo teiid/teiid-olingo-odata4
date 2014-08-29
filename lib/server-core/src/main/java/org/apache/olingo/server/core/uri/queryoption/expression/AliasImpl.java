@@ -37,8 +37,8 @@ public class AliasImpl extends ExpressionImpl implements Alias {
   }
 
   @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    return visitor.visitAlias(parameterName);
+  public void accept(final ExpressionVisitor visitor) throws ExpressionVisitException, ODataApplicationException {
+    visitor.visit(this);
   }
-
+  
 }
