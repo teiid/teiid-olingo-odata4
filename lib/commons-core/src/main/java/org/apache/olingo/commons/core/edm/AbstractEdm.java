@@ -27,12 +27,14 @@ import org.apache.olingo.commons.api.edm.EdmEntityContainer;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmFunction;
+import org.apache.olingo.commons.api.edm.EdmReference;
 import org.apache.olingo.commons.api.edm.EdmSchema;
 import org.apache.olingo.commons.api.edm.EdmServiceMetadata;
 import org.apache.olingo.commons.api.edm.EdmTerm;
 import org.apache.olingo.commons.api.edm.EdmTypeDefinition;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,7 +42,9 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractEdm implements Edm {
-
+	
+	protected Map<URI, EdmReference> references;
+	
   protected Map<String, EdmSchema> schemas;
 
   protected List<EdmSchema> schemaList;
@@ -426,7 +430,20 @@ public abstract class AbstractEdm implements Edm {
     }
     return finalFQN;
   }
-
+  
+  @Override
+  public List<EdmReference> getReferences(){
+  	if (this.references == null) {
+  		this.references = createReferences();
+  	}
+  	if (references == null || references.isEmpty()) {
+  		return null;
+  	}
+  	return Collections.unmodifiableList(new ArrayList<EdmReference>(references.values()));
+  }
+  
+  protected abstract Map<URI, EdmReference> createReferences();
+  
   protected abstract Map<String, EdmSchema> createSchemas();
 
   protected abstract Map<String, String> createAliasToNamespaceInfo();

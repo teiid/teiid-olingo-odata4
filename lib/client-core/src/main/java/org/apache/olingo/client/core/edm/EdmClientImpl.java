@@ -35,6 +35,9 @@ import org.apache.olingo.client.api.edm.xml.v4.Annotatable;
 import org.apache.olingo.client.api.edm.xml.v4.Annotation;
 import org.apache.olingo.client.api.edm.xml.v4.Annotations;
 import org.apache.olingo.client.api.edm.xml.v4.Function;
+import org.apache.olingo.client.api.edm.xml.v4.Include;
+import org.apache.olingo.client.api.edm.xml.v4.IncludeAnnotations;
+import org.apache.olingo.client.api.edm.xml.v4.Reference;
 import org.apache.olingo.client.api.edm.xml.v4.Term;
 import org.apache.olingo.client.api.edm.xml.v4.TypeDefinition;
 import org.apache.olingo.client.core.edm.v3.EdmActionProxy;
@@ -48,6 +51,9 @@ import org.apache.olingo.commons.api.edm.EdmEntityContainer;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmFunction;
+import org.apache.olingo.commons.api.edm.EdmReference;
+import org.apache.olingo.commons.api.edm.EdmReferenceInclude;
+import org.apache.olingo.commons.api.edm.EdmReferenceIncludeAnnotations;
 import org.apache.olingo.commons.api.edm.EdmSchema;
 import org.apache.olingo.commons.api.edm.EdmServiceMetadata;
 import org.apache.olingo.commons.api.edm.EdmTerm;
@@ -57,6 +63,7 @@ import org.apache.olingo.commons.api.edm.constants.ODataServiceVersion;
 import org.apache.olingo.commons.core.edm.AbstractEdm;
 import org.apache.olingo.commons.core.edm.EdmTypeInfo;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -75,8 +82,11 @@ public class EdmClientImpl extends AbstractEdm {
   private final Map<String, Schema> xmlSchemaByNamespace;
 
   private final EdmServiceMetadata serviceMetadata;
+  
+  private List<Reference> references;
 
-  public EdmClientImpl(final ODataServiceVersion version, final Map<String, Schema> xmlSchemas) {
+	public EdmClientImpl(final ODataServiceVersion version,
+			final Map<String, Schema> xmlSchemas, List<Reference> references) {
     this.version = version;
 
     this.xmlSchemaByNamespace = xmlSchemas;
@@ -89,6 +99,7 @@ public class EdmClientImpl extends AbstractEdm {
     }
 
     this.serviceMetadata = AbstractEdmServiceMetadataImpl.getInstance(version, this.xmlSchemas);
+    this.references = references;
   }
 
   @Override
@@ -473,8 +484,49 @@ public class EdmClientImpl extends AbstractEdm {
 
     return result;
   }
+  
+	@Override
+	protected Map<URI, EdmReference> createReferences() {
+		Map<URI, EdmReference> edmReferences = null;
+		if (this.references != null) {
+			edmReferences = new HashMap<URI, EdmReference>();
+			for (Reference ref:this.references) {
+				edmReferences.put(
+						ref.getUri(),
+						new EdmReferenceImpl(ref.getUri(),
+								buildIncludes(ref.getIncludes()), 
+								buildIncludeAnnoations(ref.getIncludeAnnotations())));
+			}
+		}
+		return edmReferences;
+	}  
 
-  @Override
+  private List<EdmReferenceIncludeAnnotations> buildIncludeAnnoations(
+			List<IncludeAnnotations> includeAnnotations) {
+  	if(includeAnnotations != null) {
+  		List<EdmReferenceIncludeAnnotations> includes = new ArrayList<EdmReferenceIncludeAnnotations>();
+  		for (IncludeAnnotations incl:includeAnnotations) {
+				includes.add(new EdmReferenceIncludeAnnotationsImpl(
+								incl.getTermNamespace(), 
+								incl.getQualifier(), 
+								incl.getTargetNamespace()));
+  		}
+  	}
+		return null;
+	}
+
+	private List<EdmReferenceInclude> buildIncludes(List<Include> includes) {
+		if (includes != null) {
+			List<EdmReferenceInclude> edmIncludes = new ArrayList<EdmReferenceInclude>();
+			for (Include incl:includes) {
+				edmIncludes.add(new EdmReferenceIncludeImpl(incl.getNamespace(), incl.getAlias()));
+			}
+			return edmIncludes;
+		}
+		return null;
+	}
+
+	@Override
   public boolean equals(final Object obj) {
     return EqualsBuilder.reflectionEquals(this, obj);
   }

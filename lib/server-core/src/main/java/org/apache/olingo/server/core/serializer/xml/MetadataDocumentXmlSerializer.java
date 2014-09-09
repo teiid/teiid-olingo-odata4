@@ -35,6 +35,9 @@ import org.apache.olingo.commons.api.edm.EdmNavigationPropertyBinding;
 import org.apache.olingo.commons.api.edm.EdmOperation;
 import org.apache.olingo.commons.api.edm.EdmParameter;
 import org.apache.olingo.commons.api.edm.EdmProperty;
+import org.apache.olingo.commons.api.edm.EdmReference;
+import org.apache.olingo.commons.api.edm.EdmReferenceInclude;
+import org.apache.olingo.commons.api.edm.EdmReferenceIncludeAnnotations;
 import org.apache.olingo.commons.api.edm.EdmReferentialConstraint;
 import org.apache.olingo.commons.api.edm.EdmReturnType;
 import org.apache.olingo.commons.api.edm.EdmSchema;
@@ -47,8 +50,10 @@ import org.apache.olingo.server.api.serializer.ODataSerializer;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
 import java.util.List;
 
+@SuppressWarnings("nls")
 public class MetadataDocumentXmlSerializer {
 
   private static final String XML_EXTENDS = "Extends";
@@ -522,21 +527,41 @@ public class MetadataDocumentXmlSerializer {
   private String getFullQualifiedName(final EdmType type, final boolean isCollection) {
     if (isCollection) {
       return "Collection(" + type.getNamespace() + "." + type.getName() + ")";
-    } else {
-      return type.getNamespace() + "." + type.getName();
     }
+    return type.getNamespace() + "." + type.getName();
   }
 
   private void appendReference(final XMLStreamWriter writer) throws XMLStreamException {
-    writer.writeStartElement(NS_EDMX, "Reference");
-    // TODO: Where is this value comming from?
-    writer.writeAttribute("Uri",
-        "http://localhost:9080/olingo-server-tecsvc/v4.0/cs02/vocabularies/Org.OData.Core.V1.xml");
-    writer.writeEmptyElement(NS_EDMX, "Include");
-    // TODO: Where is this value comming from?
-    writer.writeAttribute(XML_NAMESPACE, "Org.OData.Core.V1");
-    // TODO: Where is this value comming from?
-    writer.writeAttribute(XML_ALIAS, "Core");
-    writer.writeEndElement();
+  	List<EdmReference> references = this.edm.getReferences();
+  	if (references != null) {
+	  	for (EdmReference ref:references) {
+		    writer.writeStartElement(NS_EDMX, "Reference");
+		    writer.writeAttribute("Uri", ref.getUri().toASCIIString());
+		    
+		    if (ref.getIncludes() != null) {
+		    	for (EdmReferenceInclude include:ref.getIncludes()) {
+				    writer.writeEmptyElement(NS_EDMX, "Include");
+				    writer.writeAttribute(XML_NAMESPACE, include.getNamespace());
+				    if (include.getAlias() != null) {
+				    	writer.writeAttribute(XML_ALIAS, include.getAlias());
+				    }
+		    	}
+		    }
+		    
+		    if (ref.getIncludeAnnotations() != null) {
+		    	for (EdmReferenceIncludeAnnotations include:ref.getIncludeAnnotations()) {
+				    writer.writeEmptyElement(NS_EDMX, "IncludeAnnotations");
+				    writer.writeAttribute("TermNamespace", include.getTermNamespace());
+				    if (include.getQualifier() != null) {
+				    	writer.writeAttribute("Qualifier", include.getQualifier());
+				    }
+				    if (include.getTargetNamespace() != null) {
+				    	writer.writeAttribute("TargetNamespace", include.getTargetNamespace());
+				    }
+		    	}
+		    }		    
+		    writer.writeEndElement();
+	  	}
+  	}
   }
 }

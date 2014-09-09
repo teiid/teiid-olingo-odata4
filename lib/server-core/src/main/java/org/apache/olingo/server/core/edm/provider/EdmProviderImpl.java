@@ -28,6 +28,7 @@ import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmFunction;
+import org.apache.olingo.commons.api.edm.EdmReference;
 import org.apache.olingo.commons.api.edm.EdmSchema;
 import org.apache.olingo.commons.api.edm.EdmServiceMetadata;
 import org.apache.olingo.commons.api.edm.EdmTerm;
@@ -43,9 +44,11 @@ import org.apache.olingo.server.api.edm.provider.EntityType;
 import org.apache.olingo.server.api.edm.provider.EnumType;
 import org.apache.olingo.server.api.edm.provider.Function;
 import org.apache.olingo.server.api.edm.provider.Parameter;
+import org.apache.olingo.server.api.edm.provider.Reference;
 import org.apache.olingo.server.api.edm.provider.Schema;
 import org.apache.olingo.server.api.edm.provider.TypeDefinition;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,11 +59,13 @@ import java.util.Map;
 public class EdmProviderImpl extends AbstractEdm {
 
   private final EdmProvider provider;
+  
+  private Map<URI, EdmReference> references;
 
   private final Map<FullQualifiedName, List<Action>> actionsMap = new HashMap<FullQualifiedName, List<Action>>();
 
   private final Map<FullQualifiedName, List<Function>> functionsMap = new HashMap<FullQualifiedName, List<Function>>();
-
+  
   public EdmProviderImpl(final EdmProvider provider) {
     this.provider = provider;
 
@@ -349,4 +354,21 @@ public class EdmProviderImpl extends AbstractEdm {
     // TODO: implement
     return null;
   }
+
+  @Override  
+	protected Map<URI, EdmReference> createReferences() {
+		try {
+			List<Reference> references = this.provider.getReferences();
+			if (references != null && !references.isEmpty()) {
+				HashMap<URI, EdmReference> map = new HashMap<URI, EdmReference>();
+				for (Reference ref: references) {
+					map.put(ref.getUri(), new EdmReferenceImpl(ref));
+				}
+				return map;
+			}
+			return null;
+		} catch (ODataException e) {
+			throw new EdmException(e);
+		}
+	}
 }

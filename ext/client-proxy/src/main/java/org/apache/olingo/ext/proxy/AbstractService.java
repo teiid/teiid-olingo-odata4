@@ -21,13 +21,16 @@ package org.apache.olingo.ext.proxy;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 import java.lang.reflect.Proxy;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPInputStream;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.olingo.client.api.CommonEdmEnabledODataClient;
 import org.apache.olingo.client.api.edm.xml.XMLMetadata;
+import org.apache.olingo.client.api.edm.xml.v4.Reference;
 import org.apache.olingo.client.core.ODataClientFactory;
 import org.apache.olingo.client.core.edm.EdmClientImpl;
 import org.apache.olingo.commons.api.edm.Edm;
@@ -82,7 +85,13 @@ public abstract class AbstractService<C extends CommonEdmEnabledODataClient<?>> 
       IOUtils.closeQuietly(bais);
     }
 
-    final Edm edm = metadata == null ? null : new EdmClientImpl(version, metadata.getSchemaByNsOrAlias());
+    List<Reference> references = null;
+    if (metadata instanceof org.apache.olingo.client.api.edm.xml.v4.XMLMetadata) {
+			references = ((org.apache.olingo.client.api.edm.xml.v4.XMLMetadata) metadata)
+					.getReferences();
+    }
+    final Edm edm = metadata == null ? null : new EdmClientImpl(version, metadata.getSchemaByNsOrAlias(), 
+    		references);
     this.client = version.compareTo(ODataServiceVersion.V40) < 0
             ? ODataClientFactory.getEdmEnabledV3(serviceRoot, edm)
             : ODataClientFactory.getEdmEnabledV4(serviceRoot, edm, metadataETag);

@@ -192,4 +192,8 @@ public abstract class EdmProvider {
   public EntityContainer getEntityContainer() throws ODataException {
     return null;
   }
+  
+  public List<Reference> getReferences() throws ODataException {
+	  return null;
+  }
 }

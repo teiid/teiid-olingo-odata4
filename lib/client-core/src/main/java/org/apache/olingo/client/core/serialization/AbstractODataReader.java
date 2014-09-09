@@ -62,12 +62,22 @@ public abstract class AbstractODataReader implements CommonODataReader {
 
   @Override
   public Edm readMetadata(final InputStream input) {
-    return readMetadata(client.getDeserializer(ODataFormat.XML).toMetadata(input).getSchemaByNsOrAlias());
+    return readMetadata(client.getDeserializer(ODataFormat.XML).toMetadata(input));
+  }
+  
+  public Edm readMetadata(XMLMetadata metadata) {
+  	if (metadata instanceof org.apache.olingo.client.api.edm.xml.v4.XMLMetadata) {
+			return new EdmClientImpl(client.getServiceVersion(),
+					metadata.getSchemaByNsOrAlias(),
+					((org.apache.olingo.client.api.edm.xml.v4.XMLMetadata) metadata)
+							.getReferences());
+  	}
+  	return readMetadata(metadata.getSchemaByNsOrAlias());
   }
 
   @Override
   public Edm readMetadata(final Map<String, Schema> xmlSchemas) {
-    return new EdmClientImpl(client.getServiceVersion(), xmlSchemas);
+    return new EdmClientImpl(client.getServiceVersion(), xmlSchemas, null);
   }
 
   @Override

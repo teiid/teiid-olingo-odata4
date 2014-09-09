@@ -18,6 +18,7 @@
  */
 package org.apache.olingo.commons.api.edm;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -181,4 +182,10 @@ public interface Edm {
    * @return {@link EdmServiceMetadata}
    */
   EdmServiceMetadata getServiceMetadata();
+  
+  /**
+   * Get Reference documents defined in the EDM
+   * @return List {@link EdmReference} if references defined; null otherwise
+   */
+  List<EdmReference> getReferences();
 }

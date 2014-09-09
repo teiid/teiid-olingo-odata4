@@ -32,11 +32,15 @@ import org.apache.olingo.server.api.edm.provider.EntityType;
 import org.apache.olingo.server.api.edm.provider.EnumType;
 import org.apache.olingo.server.api.edm.provider.Function;
 import org.apache.olingo.server.api.edm.provider.FunctionImport;
+import org.apache.olingo.server.api.edm.provider.Reference;
 import org.apache.olingo.server.api.edm.provider.Schema;
 import org.apache.olingo.server.api.edm.provider.Singleton;
 import org.apache.olingo.server.api.edm.provider.Term;
 import org.apache.olingo.server.api.edm.provider.TypeDefinition;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -144,4 +148,19 @@ public class EdmTechProvider extends EdmProvider {
   public EntityContainerInfo getEntityContainerInfo(final FullQualifiedName entityContainerName) throws ODataException {
     return containerProvider.getEntityContainerInfo(entityContainerName);
   }
+  
+  public List<Reference> getReferences() throws ODataException {
+  	List<Reference> references = new ArrayList<Reference>();
+  	try {
+			Reference reference = new Reference();
+			reference.setUri(new URI("http://localhost:9080/olingo-server-tecsvc/"
+					+ "v4.0/cs02/vocabularies/Org.OData.Core.V1.xml"));
+			reference.setIncludes(Arrays.asList(new Reference.Include(
+					"Org.OData.Core.V1").setAlias("Core")));
+			references.add(reference);
+		} catch (URISyntaxException e) {
+			throw new ODataException(e);
+		}
+	  return references;
+  }  
 }

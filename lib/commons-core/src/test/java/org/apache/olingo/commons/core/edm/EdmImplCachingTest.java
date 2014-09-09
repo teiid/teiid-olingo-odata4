@@ -28,6 +28,7 @@ import org.apache.olingo.commons.api.edm.EdmEntityContainer;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmFunction;
+import org.apache.olingo.commons.api.edm.EdmReference;
 import org.apache.olingo.commons.api.edm.EdmSchema;
 import org.apache.olingo.commons.api.edm.EdmServiceMetadata;
 import org.apache.olingo.commons.api.edm.EdmTerm;
@@ -36,6 +37,7 @@ import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -448,5 +450,10 @@ public class EdmImplCachingTest {
       // TODO: implement
       return null;
     }
+
+		@Override
+		protected Map<URI, EdmReference> createReferences() {
+			return null;
+		}
   }
 }
